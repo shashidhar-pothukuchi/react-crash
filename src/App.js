@@ -1,26 +1,60 @@
-import React from 'react';
-import logo from './logo.svg';
+import React,{Component} from 'react';
+import {BrowserRouter as Router, Route} from 'react-router-dom';
+import Todos from './components/Todos';
 import './App.css';
+import Header from './components/Layout/Header';
+import AddToDo from './components/AddTodo';
+import About from './components/Layout/About'
+import uuid from 'uuid';
 
-function App() {
+class App extends Component{
+  state={
+    todos: []
+  }
+
+  markComplete = (id) =>{
+      console.log(id);
+      this.setState({ todos: this.state.todos.map (todo =>{
+        if(todo.id === id){
+          todo.completed = !todo.completed;
+        }
+        return todo;
+      }) });
+  } 
+
+  delTodo = (id) =>{
+    console.log(id);
+    this.setState({ todos: [...this.state.todos.filter(todo => todo.id !== id)] });
+  }
+
+  addToDo = (title) =>{
+    console.log(title);
+    const newtodo={
+      id:uuid.v4(),
+      title,
+      completed: false,
+    }
+    this.setState({ todos: [...this.state.todos, newtodo] });
+  }
+
+  render() {
   return (
+    <Router>
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <Header/>
+      <div className="container">
+      <Route exact path='/' render={ props =>(
+        <React.Fragment>
+        <AddToDo addToDo={this.addToDo} />
+        <Todos todos= {this.state.todos} markComplete={this.markComplete} delTodo={this.delTodo} />
+      </React.Fragment>
+      )}/>
+      <Route path="/about" component={About} />
+      </div>
+      </div>
+    </Router>
   );
+}
 }
 
 export default App;
